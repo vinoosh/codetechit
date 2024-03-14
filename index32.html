@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Quiz</title>
+  <style>
+    /* Add your CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .quiz-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .options {
+      list-style-type: none;
+      padding: 0;
+    }
+    .options li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Interactive Quiz</h1>
+    <div class="question" id="question">
+      <!-- Question will be loaded here -->
+    </div>
+    <ul class="options" id="options">
+      <!-- Options will be loaded here -->
+    </ul>
+    <button id="submitBtn">Submit Answer</button>
+    <div id="feedback"></div>
+    <div id="score">Score: 0</div>
+    <div id="timer">Time Left: <span id="time">10</span> seconds</div>
+  </div>
+
+  <script>
+    // Define quiz questions
+    const questions = [
+      {
+        question: "What is the capital of France?",
+        options: ["Paris", "London", "Berlin", "Madrid"],
+        answer: "Paris"
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Earth", "Mars", "Venus", "Jupiter"],
+        answer: "Mars"
+      },
+      {
+        question: "What is the powerhouse of the cell?",
+        options: ["Nucleus", "Chloroplast", "Mitochondria", "Ribosome"],
+        answer: "Mitochondria"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+
+    // Function to load question and options
+    function loadQuestion() {
+      const questionElement = document.getElementById('question');
+      const optionsElement = document.getElementById('options');
+      const question = questions[currentQuestionIndex];
+
+      questionElement.innerText = question.question;
+      optionsElement.innerHTML = '';
+
+      question.options.forEach(option => {
+        const li = document.createElement('li');
+        li.textContent = option;
+        optionsElement.appendChild(li);
+      });
+    }
+
+    // Function to start timer
+    function startTimer() {
+      let timeLeft = 10; // Timer set to 10 seconds
+      const timeElement = document.getElementById('time');
+      timer = setInterval(() => {
+        timeElement.textContent = timeLeft;
+        timeLeft--;
+        if (timeLeft < 0) {
+          clearInterval(timer);
+          handleAnswer(false);
+        }
+      }, 1000);
+    }
+
+    // Function to handle answer submission
+    function handleAnswer(selectedOption) {
+      clearInterval(timer);
+
+      const feedbackElement = document.getElementById('feedback');
+      const scoreElement = document.getElementById('score');
+
+      if (selectedOption === questions[currentQuestionIndex].answer) {
+        score++;
+        feedbackElement.textContent = 'Correct!';
+      } else {
+        feedbackElement.textContent = 'Incorrect!';
+      }
+
+      scoreElement.textContent = `Score: ${score}`;
+
+      // Move to the next question or end the quiz
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+        startTimer();
+        feedbackElement.textContent = '';
+      } else {
+        feedbackElement.textContent = `Quiz ended. Your final score is ${score} out of ${questions.length}.`;
+        document.getElementById('submitBtn').disabled = true;
+      }
+    }
+
+    // Event listener for option selection
+    document.getElementById('options').addEventListener('click', function(event) {
+      if (event.target.nodeName === 'LI') {
+        const selectedOption = event.target.textContent;
+        handleAnswer(selectedOption);
+      }
+    });
+
+    // Initial load
+    loadQuestion();
+    startTimer();
+  </script>
+</body>
+</html>
